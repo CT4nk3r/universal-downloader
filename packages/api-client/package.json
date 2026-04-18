@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@universal-downloader/shared-types": "workspace:*",
-    "openapi-fetch": "^0.13.0"
+    "openapi-fetch": "^0.17.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
