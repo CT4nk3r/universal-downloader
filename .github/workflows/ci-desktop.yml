@@ -43,6 +43,11 @@ jobs:
     name: ${{ matrix.label }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 75
+    # linux-aarch64 cross-compiles Tauri via cross-rs; the default cross
+    # container lacks the aarch64 WebKitGTK/glib sysroot, so the build
+    # currently fails. Keep it non-blocking until a custom cross image or
+    # a native arm64 runner is wired up.
+    continue-on-error: ${{ matrix.use_cross == true }}
     strategy:
       fail-fast: false
       matrix:

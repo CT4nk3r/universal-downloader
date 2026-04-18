@@ -151,6 +151,7 @@ host_triple() {
 ALL_TRIPLES=(
   "x86_64-pc-windows-msvc"
   "aarch64-pc-windows-msvc"
+  "universal-apple-darwin"
   "x86_64-apple-darwin"
   "aarch64-apple-darwin"
   "x86_64-unknown-linux-gnu"
@@ -189,7 +190,7 @@ ytdlp_sha() {
 ytdlp_asset_for() {
   case "$1" in
     x86_64-pc-windows-msvc|aarch64-pc-windows-msvc) echo "yt-dlp.exe" ;;
-    x86_64-apple-darwin|aarch64-apple-darwin)        echo "yt-dlp_macos" ;;
+    universal-apple-darwin|x86_64-apple-darwin|aarch64-apple-darwin) echo "yt-dlp_macos" ;;
     x86_64-unknown-linux-gnu)                        echo "yt-dlp_linux" ;;
     aarch64-unknown-linux-gnu)                       echo "yt-dlp_linux_aarch64" ;;
   esac
@@ -290,7 +291,7 @@ fetch_ffmpeg_macos() {
 fetch_ffmpeg() {
   local triple="$1"
   case "$triple" in
-    *apple-darwin) fetch_ffmpeg_macos "$triple" ;;
+    *apple-darwin|universal-apple-darwin) fetch_ffmpeg_macos "$triple" ;;
     *)             fetch_ffmpeg_btbn  "$triple" ;;
   esac
 }
