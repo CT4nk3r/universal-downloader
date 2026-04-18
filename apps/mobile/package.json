@@ -13,7 +13,7 @@
     "clean": "rimraf .turbo build ios/build android/build android/.gradle android/app/build"
   },
   "dependencies": {
-    "@react-navigation/bottom-tabs": "^6.6.0",
+    "@react-navigation/bottom-tabs": "^7.15.9",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.10.0",
     "@tanstack/react-query": "^5.59.0",
