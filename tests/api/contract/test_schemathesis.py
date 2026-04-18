@@ -98,7 +98,13 @@ def before_call(context, case: Case) -> None:
 @schema.parametrize()
 def test_api_conforms_to_openapi(case: Case, app) -> None:
     """For every operation, generate inputs and assert response conformance."""
-    response = case.call_asgi(app=app)
+    import os
+
+    headers = dict(case.headers or {})
+    headers.setdefault(
+        "Authorization", f"Bearer {os.environ.get('UD_API_KEY', '')}"
+    )
+    response = case.call_asgi(app=app, headers=headers)
     case.validate_response(
         response,
         checks=(
