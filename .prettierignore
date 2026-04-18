@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.next
+.turbo
+coverage
+**/generated/**
+apps/api
+apps/mobile/ios
+apps/mobile/android
+apps/desktop/src-tauri/target
+infra/tauri-sidecars/bin
+*.lock
+pnpm-lock.yaml

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "globalDependencies": ["**/.env.*local", "tsconfig.base.json"],
+  "globalEnv": ["NODE_ENV", "CI", "VERCEL_ENV"],
+  "tasks": {
+    "codegen": {
+      "inputs": ["packages/shared-types/openapi.yaml", "scripts/codegen/**"],
+      "outputs": [
+        "packages/api-client/src/generated/**",
+        "apps/api/app/models/generated.py"
+      ],
+      "cache": true
+    },
+    "build": {
+      "dependsOn": ["^build", "codegen"],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "public/**",
+        "index.html",
+        "vite.config.*",
+        "tsconfig*.json",
+        "package.json"
+      ],
+      "outputs": ["dist/**", "build/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "dependsOn": ["codegen"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["codegen"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "codegen"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build", "codegen"],
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "tests/**",
+        "vitest.config.*",
+        "package.json"
+      ]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
