@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: 255 255 255;
+  --color-fg: 11 11 15;
+  --color-muted: 100 100 110;
+  --color-border: 220 220 225;
+  --color-accent: 99 102 241;
+  --color-card: 250 250 252;
+}
+
+[data-theme='dark'] {
+  --color-bg: 11 11 15;
+  --color-fg: 240 240 245;
+  --color-muted: 140 140 150;
+  --color-border: 40 40 48;
+  --color-accent: 129 140 248;
+  --color-card: 22 22 28;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-bg text-fg font-sans antialiased;
+}

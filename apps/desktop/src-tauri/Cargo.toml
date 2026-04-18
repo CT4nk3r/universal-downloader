@@ -1,0 +1,42 @@
+[package]
+name = "universal-downloader"
+version = "0.1.0"
+description = "Universal Downloader by CT4nk3r"
+authors = ["CT4nk3r"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "universal_downloader_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+tauri-plugin-shell = "2.0"
+tauri-plugin-fs = "2.0"
+tauri-plugin-dialog = "2.0"
+tauri-plugin-deep-link = "2.0"
+tauri-plugin-updater = "2.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "process", "io-util", "fs", "time"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+thiserror = "1"
+
+# J1.8 — sidecar adapter
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+which = "6"
+regex = "1"
+sha2 = "0.10"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "env-filter"] }
+mime_guess = "2"
+url = "2"
+
+[features]
+# This feature is used for production builds where `devUrl` points to the filesystem
+# and the bundled application uses no devtools.
+custom-protocol = ["tauri/custom-protocol"]

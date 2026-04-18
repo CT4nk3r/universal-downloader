@@ -1,0 +1,14 @@
+{
+  "name": "@universal-downloader/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bash scripts/dev.sh",
+    "lint": "ruff check app",
+    "typecheck": "mypy app",
+    "test": "pytest",
+    "build": "echo \"(docker build separately)\"",
+    "codegen": "bash ../../scripts/codegen/python-models.sh",
+    "clean": "rimraf .pytest_cache .ruff_cache .mypy_cache htmlcov .coverage"
+  }
+}

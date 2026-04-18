@@ -1,0 +1,42 @@
+[project]
+name = "universal-downloader-api"
+version = "0.1.0"
+description = "Universal Downloader by CT4nk3r — FastAPI backend (yt-dlp + ffmpeg wrapper)"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "CT4nk3r" }]
+license = { text = "MIT" }
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["tests*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/models/generated.py" = ["ALL"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["app/models/generated.py"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

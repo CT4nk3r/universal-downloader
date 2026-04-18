@@ -1,0 +1,22 @@
+# Build artifacts
+target/
+gen/
+dist/
+
+# Deps
+node_modules/
+
+# Sidecar binaries (fetched by J1.8 script)
+src-tauri/binaries/
+
+# Generated icons (regenerate via `tauri icon`)
+# Comment the next line out once real icons are checked in.
+src-tauri/icons/*.png
+src-tauri/icons/*.ico
+src-tauri/icons/*.icns
+!src-tauri/icons/README.md
+
+# Misc
+.DS_Store
+*.log
+.turbo/
