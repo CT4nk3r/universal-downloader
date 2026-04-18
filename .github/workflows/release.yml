@@ -148,7 +148,10 @@ jobs:
         shell: bash
         run: |
           if [ -f infra/tauri-sidecars/fetch.sh ]; then
-            bash infra/tauri-sidecars/fetch.sh "${{ matrix.target }}" || true
+            # fetch.sh only accepts --host or no args; passing a target triple
+            # is rejected. Fetch all triples (safe: cross-compile matrix needs
+            # non-host triples too, e.g. aarch64 on macos-14 x86_64 host).
+            bash infra/tauri-sidecars/fetch.sh || true
           fi
 
       - name: Build desktop frontend
@@ -294,7 +297,7 @@ jobs:
 
       - name: SBOM (Cargo - desktop)
         working-directory: apps/desktop/src-tauri
-        run: cargo cyclonedx --format json --output-pattern bom
+        run: cargo cyclonedx --format json --override-filename bom
 
       - name: Aggregate SBOM artifacts
         run: |
