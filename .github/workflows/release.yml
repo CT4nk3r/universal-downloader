@@ -57,7 +57,7 @@ jobs:
         with:
           # `publish` is invoked only when there are no pending changesets,
           # which is changesets/action's signal that versions have been merged.
-          publish: pnpm exec changeset publish --access public
+          publish: pnpm exec changeset publish
           version: pnpm exec changeset version
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
@@ -141,7 +141,7 @@ jobs:
           fi
 
       - name: Build desktop frontend
-        run: pnpm -w exec turbo run build --filter=@ud/desktop
+        run: pnpm -w exec turbo run build --filter=@universal-downloader/desktop
 
       - name: Build Tauri bundle
         working-directory: apps/desktop

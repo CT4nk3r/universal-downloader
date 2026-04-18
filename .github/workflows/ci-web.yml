@@ -40,9 +40,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: ESLint
-        run: pnpm -w exec turbo run lint --filter=@ud/web --filter=@ud/ui --filter=@ud/shared-types --filter=@ud/api-client --filter=@ud/core-logic
+        run: pnpm -w exec turbo run lint --filter=@universal-downloader/web --filter=@universal-downloader/ui --filter=@universal-downloader/shared-types --filter=@universal-downloader/api-client --filter=@universal-downloader/core-logic
       - name: Typecheck (tsc --noEmit)
-        run: pnpm -w exec turbo run typecheck --filter=@ud/web --filter=@ud/ui --filter=@ud/shared-types --filter=@ud/api-client --filter=@ud/core-logic
+        run: pnpm -w exec turbo run typecheck --filter=@universal-downloader/web --filter=@universal-downloader/ui --filter=@universal-downloader/shared-types --filter=@universal-downloader/api-client --filter=@universal-downloader/core-logic
 
   unit:
     name: Unit Tests
@@ -56,11 +56,11 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Vitest (packages/ui)
-        run: pnpm --filter @ud/ui exec vitest run
+        run: pnpm --filter @universal-downloader/ui exec vitest run
       - name: Vitest (packages/api-client)
-        run: pnpm --filter @ud/api-client exec vitest run
+        run: pnpm --filter @universal-downloader/api-client exec vitest run
       - name: Vitest (packages/core-logic)
-        run: pnpm --filter @ud/core-logic exec vitest run
+        run: pnpm --filter @universal-downloader/core-logic exec vitest run
 
   build:
     name: Build Web
@@ -75,7 +75,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build via Turbo
-        run: pnpm -w exec turbo run build --filter=@ud/web
+        run: pnpm -w exec turbo run build --filter=@universal-downloader/web
       - name: Upload web dist
         uses: actions/upload-artifact@v4
         with:

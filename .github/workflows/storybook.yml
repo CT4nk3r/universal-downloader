@@ -43,9 +43,22 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Storybook
-        run: pnpm --filter @ud/ui build-storybook
+        run: pnpm --filter @universal-downloader/ui build-storybook
+
+      - name: Check Chromatic token
+        id: chromatic_token
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: |
+          if [ -n "$CHROMATIC_PROJECT_TOKEN" ]; then
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+            echo "CHROMATIC_PROJECT_TOKEN not set — skipping Chromatic publish."
+          fi
 
       - name: Publish to Chromatic
+        if: steps.chromatic_token.outputs.has_token == 'true'
         uses: chromaui/action@v11
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

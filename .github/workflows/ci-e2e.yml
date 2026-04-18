@@ -90,13 +90,13 @@ jobs:
           exit 1
 
       - name: Build web
-        run: pnpm --filter @ud/web build
+        run: pnpm --filter @universal-downloader/web build
         env:
           VITE_API_BASE_URL: ${{ env.API_BASE_URL }}
 
       - name: Start web preview
         run: |
-          pnpm --filter @ud/web exec vite preview --host 127.0.0.1 --port 4173 \
+          pnpm --filter @universal-downloader/web exec vite preview --host 127.0.0.1 --port 4173 \
             > web-preview.log 2>&1 &
           echo $! > web-preview.pid
           for i in {1..30}; do
@@ -200,7 +200,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build desktop (debug)
-        run: pnpm --filter @ud/desktop tauri build --debug
+        run: pnpm --filter @universal-downloader/desktop tauri build --debug
 
       - name: Run desktop E2E
         run: pnpm --filter @ud/e2e-desktop test
@@ -285,7 +285,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build desktop (debug)
-        run: pnpm --filter @ud/desktop tauri build --debug
+        run: pnpm --filter @universal-downloader/desktop tauri build --debug
 
       - name: Run desktop E2E (under Xvfb)
         run: |

@@ -213,7 +213,7 @@ jobs:
         if: matrix.use_cross != true
         shell: bash
         run: |
-          pnpm --filter @ud/desktop tauri build --target ${{ matrix.tauri_target }} --ci
+          pnpm --filter @universal-downloader/desktop tauri build --target ${{ matrix.tauri_target }} --ci
 
       # cross-rs path: build the Rust binary with cross, then re-invoke
       # tauri to package (bundling tools live on the host runner).
@@ -225,7 +225,7 @@ jobs:
           TAURI_CLI_RUNNER: cross
         run: |
           rustup target add ${{ matrix.target }} || true
-          pnpm --filter @ud/desktop tauri build --target ${{ matrix.tauri_target }} --ci --runner cross
+          pnpm --filter @universal-downloader/desktop tauri build --target ${{ matrix.tauri_target }} --ci --runner cross
 
       # ----------------------------------------------------------------------
       # Artifact upload (best-effort glob; missing bundles do not fail)
