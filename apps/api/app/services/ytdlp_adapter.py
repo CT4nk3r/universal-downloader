@@ -397,7 +397,7 @@ class YtdlpAdapterImpl:
                 return
             try:
                 coro = progress_cb(progress)
-                fut: asyncio.Future[None] = asyncio.run_coroutine_threadsafe(coro, loop)  # type: ignore[arg-type]
+                fut = asyncio.run_coroutine_threadsafe(coro, loop)  # type: ignore[arg-type]
                 # Don't block the download thread waiting for the SSE bus.
                 fut.result(timeout=0.001)
             except TimeoutError:
