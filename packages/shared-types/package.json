@@ -1,6 +1,6 @@
 {
   "name": "@universal-downloader/shared-types",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,10 @@
     ".": "./src/index.ts",
     "./openapi": "./openapi.yaml"
   },
-  "files": ["src", "openapi.yaml"],
+  "files": [
+    "src",
+    "openapi.yaml"
+  ],
   "scripts": {
     "lint": "echo \"(no-op)\"",
     "typecheck": "tsc --noEmit",
