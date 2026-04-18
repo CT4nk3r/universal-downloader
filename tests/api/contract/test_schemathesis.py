@@ -86,7 +86,7 @@ def before_call(context, case: Case) -> None:
 
     api_key = os.environ.get("UD_API_KEY", "")
     headers = dict(case.headers or {})
-    headers.setdefault("Authorization", f"Bearer {api_key}")
+    headers["Authorization"] = f"Bearer {api_key}"
     case.headers = headers
 
 
@@ -101,9 +101,7 @@ def test_api_conforms_to_openapi(case: Case, app) -> None:
     import os
 
     headers = dict(case.headers or {})
-    headers.setdefault(
-        "Authorization", f"Bearer {os.environ.get('UD_API_KEY', '')}"
-    )
+    headers["Authorization"] = f"Bearer {os.environ.get('UD_API_KEY', '')}"
     case.headers = headers
     response = case.call_asgi(app=app)
     case.validate_response(
