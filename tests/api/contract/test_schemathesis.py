@@ -44,6 +44,7 @@ _SCHEMA_PATH = _REPO_ROOT / "packages" / "shared-types" / "openapi.yaml"
 schema = schemathesis.from_path(
     str(_SCHEMA_PATH),
     base_url="http://testserver/v1",
+    force_schema_version="30",
 )
 
 
