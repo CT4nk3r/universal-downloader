@@ -207,6 +207,15 @@ jobs:
         run: bash infra/tauri-sidecars/fetch.sh
 
       # ----------------------------------------------------------------------
+      # Generate API-client types (schema.ts) before tauri's beforeBuildCommand.
+      # The desktop `web:build` script runs tsc directly and does NOT traverse
+      # Turbo's dependency graph, so codegen must be invoked explicitly here.
+      # ----------------------------------------------------------------------
+      - name: Generate API-client schema
+        shell: bash
+        run: pnpm --filter @universal-downloader/api-client codegen
+
+      # ----------------------------------------------------------------------
       # Tauri build (no signing — explicitly omit --sign / signing env vars)
       # ----------------------------------------------------------------------
       - name: Tauri build (native)

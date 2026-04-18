@@ -1,0 +1,6 @@
+import{j as m}from"./jsx-runtime-DFAAy_2V.js";import{r as b}from"./index-Bc2G9s8g.js";import{c as g}from"./cn-BLSKlp9E.js";const a=b.forwardRef(({className:s,type:i="text",...l},u)=>m.jsx("input",{ref:u,type:i,className:g("flex h-10 w-full rounded-md border border-[rgb(var(--ud-border))] bg-[rgb(var(--ud-bg))] px-3 py-2 text-sm text-[rgb(var(--ud-fg))] placeholder:text-[rgb(var(--ud-muted-fg))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--ud-primary))] disabled:cursor-not-allowed disabled:opacity-50",s),...l}));a.displayName="Input";try{a.displayName="Input",a.__docgenInfo={description:"",displayName:"Input",props:{}}}catch{}const _={title:"Components/Input",component:a,args:{placeholder:"Type something…"}},e={},r={args:{disabled:!0,value:"Disabled"}};var o,t,d;e.parameters={...e.parameters,docs:{...(o=e.parameters)==null?void 0:o.docs,source:{originalSource:"{}",...(d=(t=e.parameters)==null?void 0:t.docs)==null?void 0:d.source}}};var p,n,c;r.parameters={...r.parameters,docs:{...(p=r.parameters)==null?void 0:p.docs,source:{originalSource:`{
+  args: {
+    disabled: true,
+    value: 'Disabled'
+  }
+}`,...(c=(n=r.parameters)==null?void 0:n.docs)==null?void 0:c.source}}};const y=["Default","Disabled"];export{e as Default,r as Disabled,y as __namedExportsOrder,_ as default};
