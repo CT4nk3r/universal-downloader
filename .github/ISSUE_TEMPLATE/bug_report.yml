@@ -1,0 +1,74 @@
+name: Bug report
+description: Report a reproducible bug
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please fill out the sections below.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release tag, commit SHA, or app version
+      placeholder: v0.1.0 / abc1234
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - API (self-hosted)
+        - Web
+        - Desktop (Windows)
+        - Desktop (macOS)
+        - Desktop (Linux)
+        - Mobile (iOS)
+        - Mobile (Android)
+        - Docs
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Exact steps to reproduce. Include URLs only if public domain / your own content.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      render: shell
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, browser, Node, Python, Rust versions
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I am not requesting help to violate a site's Terms of Service
+          required: true

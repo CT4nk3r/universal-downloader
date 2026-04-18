@@ -1,0 +1,70 @@
+name: storybook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/storybook.yml'
+  workflow_dispatch:
+
+concurrency:
+  # Serialize with mkdocs (J4.1) writes to gh-pages to avoid racey force-pushes.
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 9
+  NODE_VERSION: 20
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Storybook
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Chromatic needs full git history for baseline detection.
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm --filter @ud/ui build-storybook
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v11
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/ui
+          storybookBuildDir: storybook-static
+          # Don't fail the workflow on visual diffs; reviewers approve in Chromatic UI.
+          exitZeroOnChanges: true
+          # Avoid re-building since we built above.
+          onlyChanged: true
+
+      - name: Deploy to gh-pages (/storybook subpath)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: packages/ui/storybook-static
+          destination_dir: storybook
+          keep_files: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'docs(storybook): deploy ${{ github.sha }}'

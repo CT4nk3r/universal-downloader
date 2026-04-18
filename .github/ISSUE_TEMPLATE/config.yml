@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and discussions
+    url: https://github.com/ct4nk3r/universal-downloader/discussions
+    about: Ask questions, share ideas, or get help with setup
+  - name: Security vulnerability
+    url: https://github.com/ct4nk3r/universal-downloader/security/advisories/new
+    about: Report a vulnerability privately (do NOT open a public issue)
