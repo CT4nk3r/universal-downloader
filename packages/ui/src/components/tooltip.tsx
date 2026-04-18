@@ -1,12 +1,7 @@
-import {
-  forwardRef,
-  useState,
-  type HTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { forwardRef, useState, type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
 
-export interface TooltipProps extends HTMLAttributes<HTMLSpanElement> {
+export interface TooltipProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'content'> {
   content: ReactNode;
   side?: 'top' | 'bottom' | 'left' | 'right';
   children: ReactNode;

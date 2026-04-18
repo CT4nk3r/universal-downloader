@@ -7,8 +7,7 @@ export const toastVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          'border-[rgb(var(--ud-border))] bg-[rgb(var(--ud-bg))] text-[rgb(var(--ud-fg))]',
+        default: 'border-[rgb(var(--ud-border))] bg-[rgb(var(--ud-bg))] text-[rgb(var(--ud-fg))]',
         success:
           'border-[rgb(var(--ud-success))]/40 bg-[rgb(var(--ud-success))]/10 text-[rgb(var(--ud-fg))]',
         warning:
@@ -28,7 +27,8 @@ export type ToastVariantProps = VariantProps<typeof toastVariants>;
 
 export type ToastVariant = NonNullable<ToastVariantProps['variant']>;
 
-export interface ToastProps extends HTMLAttributes<HTMLDivElement>, ToastVariantProps {
+export interface ToastProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>, ToastVariantProps {
   title?: ReactNode;
   description?: ReactNode;
   onDismiss?: () => void;
