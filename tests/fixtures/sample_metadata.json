@@ -1,0 +1,98 @@
+{
+  "id": "dQw4w9WgXcQ_fixture",
+  "title": "Sample Fixture Video",
+  "uploader": "fixture-uploader",
+  "uploader_id": "fixture-uploader-id",
+  "upload_date": "20240101",
+  "duration": 212,
+  "view_count": 12345,
+  "like_count": 678,
+  "description": "A synthetic yt-dlp info_dict used for offline tests. Do not treat as real metadata.",
+  "thumbnail": "https://example.invalid/fixtures/sample_thumbnail.jpg",
+  "thumbnails": [
+    {
+      "id": "0",
+      "url": "https://example.invalid/fixtures/sample_thumbnail_low.jpg",
+      "width": 320,
+      "height": 180
+    },
+    {
+      "id": "1",
+      "url": "https://example.invalid/fixtures/sample_thumbnail.jpg",
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "webpage_url": "https://example.invalid/watch?v=dQw4w9WgXcQ_fixture",
+  "extractor": "fixture",
+  "extractor_key": "Fixture",
+  "ext": "mp4",
+  "format_id": "22",
+  "formats": [
+    {
+      "format_id": "140",
+      "ext": "m4a",
+      "acodec": "mp4a.40.2",
+      "vcodec": "none",
+      "abr": 128,
+      "filesize": 3400000,
+      "url": "https://example.invalid/fixtures/audio_140.m4a"
+    },
+    {
+      "format_id": "251",
+      "ext": "webm",
+      "acodec": "opus",
+      "vcodec": "none",
+      "abr": 160,
+      "filesize": 4200000,
+      "url": "https://example.invalid/fixtures/audio_251.webm"
+    },
+    {
+      "format_id": "18",
+      "ext": "mp4",
+      "acodec": "mp4a.40.2",
+      "vcodec": "avc1.42001E",
+      "width": 640,
+      "height": 360,
+      "fps": 30,
+      "tbr": 568,
+      "filesize": 14800000,
+      "url": "https://example.invalid/fixtures/muxed_360p.mp4"
+    },
+    {
+      "format_id": "22",
+      "ext": "mp4",
+      "acodec": "mp4a.40.2",
+      "vcodec": "avc1.64001F",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "tbr": 1280,
+      "filesize": 33000000,
+      "url": "https://example.invalid/fixtures/muxed_720p.mp4"
+    },
+    {
+      "format_id": "137",
+      "ext": "mp4",
+      "acodec": "none",
+      "vcodec": "avc1.640028",
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "tbr": 4400,
+      "filesize": 110000000,
+      "url": "https://example.invalid/fixtures/video_1080p.mp4"
+    }
+  ],
+  "subtitles": {
+    "en": [
+      {
+        "ext": "vtt",
+        "url": "https://example.invalid/fixtures/subs_en.vtt"
+      }
+    ]
+  },
+  "automatic_captions": {},
+  "categories": ["Entertainment"],
+  "tags": ["fixture", "test", "offline"]
+}

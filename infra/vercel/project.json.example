@@ -1,0 +1,35 @@
+{
+  "//": "Example Vercel project configuration for apps/web. Copy to .vercel/project.json (gitignored) after `vercel link`, or use `vercel pull` in CI. Documents the environment variables that must be configured in the Vercel project dashboard (Settings → Environment Variables) or via `vercel env add`.",
+
+  "projectId": "prj_REPLACE_ME",
+  "orgId": "team_REPLACE_ME",
+  "projectName": "ud-web",
+  "framework": "vite",
+  "rootDirectory": "apps/web",
+  "buildCommand": "pnpm -w exec turbo run build --filter=@ud/web",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "dist",
+
+  "env": {
+    "VITE_DEFAULT_API_BASE": {
+      "required": true,
+      "description": "Base URL of the backend API consumed by @ud/api-client (e.g. https://api.example.com). Must be set for Production, Preview, and Development environments.",
+      "example": "https://api.example.com"
+    }
+  },
+
+  "secrets": {
+    "VERCEL_TOKEN": {
+      "scope": "github-actions",
+      "description": "Personal/Team Vercel token used by .github/workflows/ci-web.yml for `vercel pull`, `vercel build`, and `vercel deploy`. Stored as a GitHub Actions repository secret (Settings → Secrets and variables → Actions). Generate at https://vercel.com/account/tokens."
+    }
+  },
+
+  "notes": [
+    "This file is an EXAMPLE only. Do not commit a real .vercel/project.json.",
+    "Required GitHub Actions secret: VERCEL_TOKEN.",
+    "Required Vercel project env var: VITE_DEFAULT_API_BASE (Production + Preview + Development).",
+    "Preview deploys are triggered on PRs touching apps/web, packages/ui, packages/shared-types, packages/api-client, or packages/core-logic.",
+    "Production deploys are triggered on push to main with the same path filters."
+  ]
+}

@@ -1,0 +1,55 @@
+# Universal Downloader by CT4nk3r — docker build context ignore
+
+# VCS / CI
+.git
+.github
+.gitignore
+.gitattributes
+
+# Node / pnpm workspaces (not needed for API image)
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/.vercel
+**/.svelte-kit
+
+# Rust
+**/target
+
+# Python build artefacts / caches
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.coverage
+**/coverage.xml
+**/htmlcov
+**/.venv
+**/venv
+**/*.egg-info
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Tests / docs / changesets (not needed in image)
+tests
+docs
+.changeset
+**/*.md
+
+# Local data / downloads
+data
+downloads
+**/.env
+**/.env.*
+!**/.env.example
+
+# Other infra not needed in API image
+infra/tauri-sidecars
+apps/desktop
+apps/web

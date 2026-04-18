@@ -1,0 +1,22 @@
+# Treat Xcode project files as binary-ish to reduce noisy diffs and use union merge
+# to minimize spurious conflicts on additive changes.
+*.pbxproj binary merge=union
+
+# Xcode-related files: prefer union merge where safe
+*.xcworkspacedata text merge=union eol=lf
+*.xcsettings    text merge=union eol=lf
+*.xcscheme      text merge=union eol=lf
+
+# Common binary asset types in mobile projects
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.pdf  binary
+*.ico  binary
+*.keystore binary
+*.jks      binary
+*.mobileprovision binary
+*.p12 binary
+*.cer binary

@@ -1,0 +1,49 @@
+# Universal Downloader by CT4nk3r — local dev compose
+# Builds the API from infra/docker/api.Dockerfile (the canonical image).
+# Note: apps/api/Dockerfile is preserved for backwards-compat but unused here.
+
+services:
+  api:
+    image: ghcr.io/ct4nk3r/universal-downloader-api:dev
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    container_name: ud-api
+    restart: unless-stopped
+    environment:
+      UD_PORT: "8787"
+      UD_DATA_DIR: /data
+      UD_REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8787:8787"
+    volumes:
+      - downloads:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "curl -fsS http://127.0.0.1:8787/healthz || curl -fsS http://127.0.0.1:8787/v1/health || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: ud-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  downloads:
+  redis-data:

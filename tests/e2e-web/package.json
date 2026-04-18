@@ -1,0 +1,17 @@
+{
+  "name": "@ud/e2e-web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "End-to-end browser tests for the Universal Downloader web app.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "msw": "^2.3.0",
+    "typescript": "^5.4.0"
+  }
+}

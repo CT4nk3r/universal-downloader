@@ -1,0 +1,46 @@
+# Vercel ignore — keep deployment payload minimal
+
+# Dependencies (Vercel installs from lockfile)
+node_modules
+**/node_modules
+
+# Build outputs not needed by Vercel build (vercel build emits .vercel/output)
+dist
+build
+.next
+.turbo
+
+# Tests & coverage
+coverage
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+tests
+
+# Tooling / config not needed at runtime
+.eslintrc*
+.prettierrc*
+.prettierignore
+.editorconfig
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
+
+# VCS / CI / editor
+.git
+.github
+.vscode
+.idea
+
+# Other workspace apps & infra (Vercel only deploys apps/web)
+../desktop
+../../infra/tauri-sidecars
+../../scripts
+../../docs
+
+# Logs & local env
+*.log
+.env
+.env.*
+!.env.example

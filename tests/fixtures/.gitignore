@@ -1,0 +1,9 @@
+# Ignore real media assets — fixtures must stay tiny.
+*.mp4
+*.webm
+*.mkv
+*.m4a
+*.opus
+
+# But keep the placeholder so the directory exists in git.
+!sample.mp4.placeholder

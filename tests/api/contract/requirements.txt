@@ -1,0 +1,7 @@
+# Pinned to the 3.x line. Schemathesis 3.x exposes the `from_path`,
+# `@schemathesis.hook`, `as_state_machine`, and `Case.call_asgi` APIs used
+# by `test_schemathesis.py`. Hypothesis is a transitive dep but pinned
+# explicitly so the strategy seeding stays reproducible across CI runs.
+schemathesis>=3.27,<4
+hypothesis>=6.100,<7
+pytest>=8,<9

@@ -1,0 +1,62 @@
+{
+  "data": {
+    "tweetResult": {
+      "result": {
+        "__typename": "Tweet",
+        "rest_id": "1700000000000000000",
+        "core": {
+          "user_results": {
+            "result": {
+              "__typename": "User",
+              "rest_id": "10000001",
+              "legacy": {
+                "screen_name": "fixture_user",
+                "name": "Fixture User",
+                "verified": false,
+                "followers_count": 42
+              }
+            }
+          }
+        },
+        "legacy": {
+          "id_str": "1700000000000000000",
+          "created_at": "Mon Jan 01 12:00:00 +0000 2024",
+          "full_text": "This is a synthetic X post used for offline tests. https://t.co/fixture",
+          "lang": "en",
+          "favorite_count": 7,
+          "retweet_count": 2,
+          "reply_count": 1,
+          "quote_count": 0,
+          "entities": {
+            "media": [
+              {
+                "id_str": "1700000000000000001",
+                "media_url_https": "https://pbs.invalid/media/fixture.jpg",
+                "type": "video",
+                "video_info": {
+                  "duration_millis": 12000,
+                  "variants": [
+                    {
+                      "bitrate": 320000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.invalid/fixture_low.mp4"
+                    },
+                    {
+                      "bitrate": 832000,
+                      "content_type": "video/mp4",
+                      "url": "https://video.invalid/fixture_med.mp4"
+                    },
+                    {
+                      "content_type": "application/x-mpegURL",
+                      "url": "https://video.invalid/fixture.m3u8"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
