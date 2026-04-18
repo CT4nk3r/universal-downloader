@@ -6,7 +6,7 @@
  * `never`. We mirror the contract here so screens can compile under TS strict
  * without `any`. Hook results are cast to these via `as unknown as UiX`.
  */
-import type { JobStatus, QualityPreset, SiteId } from '@universal-downloader/shared-types';
+import type { JobStatus, QualityPreset } from '@universal-downloader/shared-types';
 
 export interface UiFormat {
   format_id: string;
@@ -22,7 +22,7 @@ export interface UiFormat {
 
 export interface UiProbeResult {
   url: string;
-  site: SiteId | string;
+  site: string;
   title: string;
   uploader?: string | null;
   duration_seconds?: number | null;
@@ -42,7 +42,7 @@ export interface UiJob {
   id: string;
   url: string;
   title?: string | null;
-  site?: SiteId | string | null;
+  site?: string | null;
   status: JobStatus;
   preset?: QualityPreset | null;
   progress?: UiJobProgress | null;
@@ -71,7 +71,7 @@ export interface UiJobEvent {
 }
 
 export interface UiHealth {
-  status: 'ok' | 'degraded' | string;
+  status: string;
   version?: string;
   uptime_seconds?: number;
 }

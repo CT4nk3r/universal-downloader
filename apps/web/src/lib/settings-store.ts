@@ -8,9 +8,10 @@
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { QualityPreset } from '@universal-downloader/shared-types';
 
 export type Theme = 'system' | 'light' | 'dark';
-export type Preset = 'best' | 'audio' | 'video-1080p' | 'video-720p';
+export type Preset = QualityPreset;
 
 export interface SettingsState {
   apiBaseUrl: string;
@@ -27,8 +28,7 @@ export interface SettingsState {
 }
 
 const DEFAULT_API_URL =
-  (import.meta.env.VITE_DEFAULT_API_URL as string | undefined) ??
-  'http://localhost:8787/v1';
+  (import.meta.env.VITE_DEFAULT_API_URL as string | undefined) ?? 'http://localhost:8787/v1';
 
 const defaults = {
   apiBaseUrl: DEFAULT_API_URL,
@@ -63,3 +63,6 @@ export const useSettings = create<SettingsState>()(
     },
   ),
 );
+
+/** Alias kept for code that imports the store under its longer name. */
+export const useSettingsStore = useSettings;

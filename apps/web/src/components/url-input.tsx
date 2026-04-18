@@ -44,7 +44,10 @@ export function UrlInput({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <label
+        htmlFor={id}
+        className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-200"
+      >
         Video URL
       </label>
       <div className="flex w-full flex-col gap-2 sm:flex-row">
@@ -80,7 +83,9 @@ export function UrlInput({
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={handlePaste}
+            onClick={() => {
+              void handlePaste();
+            }}
             className="inline-flex items-center gap-1.5 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             <ClipboardPaste className="h-4 w-4" aria-hidden="true" />

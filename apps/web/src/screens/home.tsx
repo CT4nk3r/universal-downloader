@@ -3,7 +3,6 @@ import { Download, Loader2 } from 'lucide-react';
 import { useApi } from '@/lib/api-context';
 import { useCreateJob, useProbe } from '@universal-downloader/api-client/hooks';
 import type { CreateJobRequest } from '@universal-downloader/api-client';
-import type { QualityPreset } from '@universal-downloader/shared-types';
 import { UrlInput } from '@/components/url-input';
 import { ProbeCard } from '@/components/probe-card';
 import { FormatPicker, type FormatChoice } from '@/components/format-picker';
@@ -81,7 +80,7 @@ export function HomeScreen(): JSX.Element {
     const body: CreateJobRequest = {
       url: probe.url,
       ...(choice.kind === 'preset'
-        ? { preset: choice.preset as QualityPreset }
+        ? { preset: choice.preset }
         : { format_id: choice.format_id, container: choice.container as never }),
       audio_only: choice.kind === 'preset' && choice.preset.startsWith('audio_'),
       subtitles: subtitlesObj,
@@ -122,15 +121,13 @@ export function HomeScreen(): JSX.Element {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-4 sm:p-6">
-      <UrlInput
-        value={url}
-        onChange={setUrl}
-        onSubmit={handleProbe}
-        busy={probeMut.isPending}
-      />
+      <UrlInput value={url} onChange={setUrl} onSubmit={handleProbe} busy={probeMut.isPending} />
 
       {probeMut.isError && (
-        <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
+        <p
+          role="alert"
+          className="rounded bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200"
+        >
           {probeMut.error instanceof Error ? probeMut.error.message : 'Probe failed.'}
         </p>
       )}
@@ -168,9 +165,7 @@ export function HomeScreen(): JSX.Element {
                   placeholder="en, es"
                   disabled={!options.subtitles}
                   value={options.subtitleLangs}
-                  onChange={(e) =>
-                    setOptions((o) => ({ ...o, subtitleLangs: e.target.value }))
-                  }
+                  onChange={(e) => setOptions((o) => ({ ...o, subtitleLangs: e.target.value }))}
                   className="w-full rounded-md border border-zinc-300 bg-white px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900"
                 />
               </label>
@@ -208,9 +203,7 @@ export function HomeScreen(): JSX.Element {
                 <input
                   type="checkbox"
                   checked={options.embedThumb}
-                  onChange={(e) =>
-                    setOptions((o) => ({ ...o, embedThumb: e.target.checked }))
-                  }
+                  onChange={(e) => setOptions((o) => ({ ...o, embedThumb: e.target.checked }))}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400"
                 />
                 Embed thumbnail
@@ -219,9 +212,7 @@ export function HomeScreen(): JSX.Element {
                 <input
                   type="checkbox"
                   checked={options.embedMeta}
-                  onChange={(e) =>
-                    setOptions((o) => ({ ...o, embedMeta: e.target.checked }))
-                  }
+                  onChange={(e) => setOptions((o) => ({ ...o, embedMeta: e.target.checked }))}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-400"
                 />
                 Embed metadata
@@ -230,14 +221,19 @@ export function HomeScreen(): JSX.Element {
           </fieldset>
 
           {submitError && (
-            <p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
+            <p
+              role="alert"
+              className="rounded bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200"
+            >
               {submitError}
             </p>
           )}
 
           <button
             type="button"
-            onClick={handleDownload}
+            onClick={() => {
+              void handleDownload();
+            }}
             disabled={createJob.isPending}
             className="inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
           >

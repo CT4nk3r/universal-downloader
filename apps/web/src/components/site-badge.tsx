@@ -1,13 +1,15 @@
 import { Globe, Youtube, Facebook, MessageCircle, Twitter } from 'lucide-react';
-import type { SiteId } from '@universal-downloader/shared-types';
 
 interface SiteBadgeProps {
-  site: SiteId | string | null | undefined;
+  site: string | null | undefined;
   className?: string;
 }
 
 const META: Record<string, { label: string; classes: string }> = {
-  youtube: { label: 'YouTube', classes: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' },
+  youtube: {
+    label: 'YouTube',
+    classes: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200',
+  },
   x: { label: 'X', classes: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100' },
   facebook: {
     label: 'Facebook',
