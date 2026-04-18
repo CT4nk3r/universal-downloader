@@ -61,35 +61,17 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          # We do NOT publish to npm. When the Version PR is merged (no
-          # pending changesets), this script creates a single aggregate
-          # `vX.Y.Z` git tag derived from the shared-types package
-          # version. The `linked` config in .changeset/config.json keeps
-          # all publishable packages at the same version, so any of them
-          # is a valid source of truth. The action then runs
-          # `git push --follow-tags`, and that tag push re-enters this
-          # workflow via the tag trigger above to run the binary /
-          # docker / SBOM / release jobs exactly once per release.
-          publish: |
-            bash -eu -o pipefail -c '
-              # Only tag when HEAD actually bumped package versions. This
-              # is robust across merge strategies (squash / rebase /
-              # merge) because the Version PR always modifies
-              # packages/*/package.json.
-              if ! git diff-tree --no-commit-id --name-only -r HEAD \
-                | grep -qE "^packages/.*/package\.json$"; then
-                echo "HEAD did not modify packages/*/package.json; skipping tag."
-                exit 0
-              fi
-              version=$(node -p "require(\"./packages/shared-types/package.json\").version")
-              tag="v${version}"
-              if git rev-parse "refs/tags/${tag}" >/dev/null 2>&1; then
-                echo "Tag ${tag} already exists, nothing to do."
-                exit 0
-              fi
-              git tag -a "${tag}" -m "Release ${tag}"
-              echo "Created tag ${tag}"
-            '
+          # We do NOT publish to npm. When the Version PR is merged
+          # (no pending changesets), this script creates a single
+          # aggregate `vX.Y.Z` git tag derived from the shared-types
+          # package version. The `linked` config in
+          # .changeset/config.json keeps all publishable packages at
+          # the same version, so any of them is a valid source of
+          # truth. The action then runs `git push --follow-tags`, and
+          # that tag push re-enters this workflow via the tag trigger
+          # above to run the binary / docker / SBOM / release jobs
+          # exactly once per release.
+          publish: bash scripts/release-tag.sh
           version: pnpm exec changeset version
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
