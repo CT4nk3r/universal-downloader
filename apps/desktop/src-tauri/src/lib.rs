@@ -4,6 +4,7 @@
 //! the `invoke_handler` (see [`commands`]) and starts the event loop.
 
 pub mod commands;
+pub mod error;
 pub mod sidecar;
 
 /// Build and run the Tauri application.
