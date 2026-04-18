@@ -48,7 +48,7 @@ jobs:
         run: pnpm --filter @ud/ui build-storybook
 
       - name: Publish to Chromatic
-        uses: chromaui/action@v11
+        uses: chromaui/action@v16
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: packages/ui
