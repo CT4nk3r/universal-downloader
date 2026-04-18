@@ -3,8 +3,14 @@ name: release
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
+      - '*@[0-9]+.[0-9]+.[0-9]+*'
+      - '**/*@[0-9]+.[0-9]+.[0-9]+*'
 
 concurrency:
+  # Separate groups per ref so a tag push doesn't cancel a main-branch run
+  # (or vice versa). Never cancel-in-progress for releases.
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
@@ -22,10 +28,13 @@ env:
 
 jobs:
   # ----------------------------------------------------------------------------
-  # 1. Changesets: open Version PR or publish to npm when versions land on main
+  # 1. Changesets: open Version PR or push git tags when versions land on main.
+  #    Runs only on branch pushes to main; tag pushes skip straight to the
+  #    downstream binary / docker / release jobs.
   # ----------------------------------------------------------------------------
   changesets:
-    name: Version PR / Publish npm
+    name: Version PR / Tag release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.changesets.outputs.published }}
@@ -43,7 +52,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -51,20 +59,21 @@ jobs:
       - name: Build publishable packages
         run: pnpm -w exec turbo run build --filter=./packages/*
 
-      - name: Create Release PR or Publish to npm
+      - name: Create Version PR or push release tags
         id: changesets
         uses: changesets/action@v1
         with:
-          # `publish` is invoked only when there are no pending changesets,
-          # which is changesets/action's signal that versions have been merged.
-          publish: pnpm exec changeset publish
+          # We do NOT publish to npm (all packages are private). Instead
+          # `changeset tag` creates git tags for each bumped package; the
+          # action pushes them, which re-triggers this workflow via the
+          # tag-push trigger above, running the binary / docker / release
+          # jobs below.
+          publish: pnpm exec changeset tag
           version: pnpm exec changeset version
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # ----------------------------------------------------------------------------
   # 2. Desktop binaries (Tauri) — replicates the ci-desktop matrix.
@@ -72,8 +81,7 @@ jobs:
   # ----------------------------------------------------------------------------
   build-desktop:
     name: Desktop ${{ matrix.target }}
-    needs: changesets
-    if: needs.changesets.outputs.published == 'true'
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -189,8 +197,7 @@ jobs:
   # ----------------------------------------------------------------------------
   publish-docker:
     name: Publish API image
-    needs: changesets
-    if: needs.changesets.outputs.published == 'true'
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -254,8 +261,7 @@ jobs:
   # ----------------------------------------------------------------------------
   sbom:
     name: Generate SBOM
-    needs: changesets
-    if: needs.changesets.outputs.published == 'true'
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -307,8 +313,8 @@ jobs:
   # ----------------------------------------------------------------------------
   github-release:
     name: GitHub Release
-    needs: [changesets, build-desktop, sbom]
-    if: needs.changesets.outputs.published == 'true'
+    needs: [build-desktop, sbom]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -318,9 +324,14 @@ jobs:
       - name: Resolve release tag
         id: tag
         shell: bash
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          # Prefer the most recent semver tag created by changesets.
-          tag=$(git tag --points-at HEAD | grep -E '@[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+          # Workflow is tag-triggered, so github.ref_name is the tag itself.
+          tag="$REF_NAME"
+          if [ -z "$tag" ]; then
+            tag=$(git tag --points-at HEAD | grep -E '@[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+          fi
           if [ -z "$tag" ]; then
             tag=$(git tag --list 'v*' --sort=-v:refname | head -n1)
           fi
