@@ -10,12 +10,18 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import Any, AsyncIterator, Optional
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlmodel import JSON, Column, Field, SQLModel, String
 
 # ---------------------------------------------------------------------------
@@ -36,7 +42,7 @@ if not _DB_URL:
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # ---------------------------------------------------------------------------
@@ -56,18 +62,18 @@ class JobRow(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     url: str = Field(sa_column=Column(String, nullable=False))
-    site: Optional[str] = Field(default=None, index=True)
+    site: str | None = Field(default=None, index=True)
     status: str = Field(default="queued", index=True)
     progress: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
-    title: Optional[str] = Field(default=None)
-    thumbnail_url: Optional[str] = Field(default=None)
+    title: str | None = Field(default=None)
+    thumbnail_url: str | None = Field(default=None)
     request: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=_utcnow, index=True)
-    started_at: Optional[datetime] = Field(default=None)
-    finished_at: Optional[datetime] = Field(default=None)
-    expires_at: Optional[datetime] = Field(default=None, index=True)
-    file: Optional[dict[str, Any]] = Field(default=None, sa_column=Column(JSON, nullable=True))
-    error: Optional[dict[str, Any]] = Field(default=None, sa_column=Column(JSON, nullable=True))
+    started_at: datetime | None = Field(default=None)
+    finished_at: datetime | None = Field(default=None)
+    expires_at: datetime | None = Field(default=None, index=True)
+    file: dict[str, Any] | None = Field(default=None, sa_column=Column(JSON, nullable=True))
+    error: dict[str, Any] | None = Field(default=None, sa_column=Column(JSON, nullable=True))
 
 
 # ---------------------------------------------------------------------------

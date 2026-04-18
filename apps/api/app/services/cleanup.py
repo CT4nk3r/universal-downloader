@@ -7,7 +7,7 @@ Scheduled by :class:`app.services.worker.WorkerSettings` to run every
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
@@ -54,7 +54,7 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
                 from . import file_store as fs_mod  # type: ignore[import-not-found]
 
                 file_store = getattr(fs_mod, "store", None) or fs_mod.LocalFileStore()
-            except Exception as exc:  # noqa: BLE001 - cleanup must keep going
+            except Exception as exc:
                 log.warning("cleanup: file_store unavailable (%s)", exc)
                 file_store = None
 
@@ -68,7 +68,7 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
             if file_store is not None:
                 try:
                     await file_store.delete(row.id)
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     log.warning("cleanup: delete failed for %s (%s)", row.id, exc)
 
             expired_count += 1
@@ -79,8 +79,9 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
         # Publish status events on a best-effort basis so live SSE clients learn
         # about the expiration too.
         try:
-            from .job_engine import engine
             from app.models import JobEventStatus  # type: ignore[attr-defined]
+
+            from .job_engine import engine
 
             for row in rows:
                 if row.status != EXPIRED:

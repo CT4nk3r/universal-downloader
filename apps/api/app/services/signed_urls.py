@@ -49,7 +49,7 @@ def _signing_key() -> bytes:
 
 
 def _mac(job_id: UUID, exp: int) -> str:
-    payload = f"{job_id}:{exp}".encode("utf-8")
+    payload = f"{job_id}:{exp}".encode()
     return hmac.new(_signing_key(), payload, hashlib.sha256).hexdigest()
 
 

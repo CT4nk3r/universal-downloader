@@ -11,7 +11,10 @@ from urllib.parse import urlparse
 SiteId = Literal["youtube", "x", "facebook", "reddit"]
 
 _SITE_PATTERNS: tuple[tuple[SiteId, re.Pattern[str]], ...] = (
-    ("youtube", re.compile(r"(?:^|\.)(youtube\.com|youtu\.be|youtube-nocookie\.com)$", re.IGNORECASE)),
+    (
+        "youtube",
+        re.compile(r"(?:^|\.)(youtube\.com|youtu\.be|youtube-nocookie\.com)$", re.IGNORECASE),
+    ),
     ("x", re.compile(r"(?:^|\.)(twitter\.com|x\.com|t\.co)$", re.IGNORECASE)),
     ("facebook", re.compile(r"(?:^|\.)(facebook\.com|fb\.watch|fb\.com)$", re.IGNORECASE)),
     ("reddit", re.compile(r"(?:^|\.)(reddit\.com|redd\.it)$", re.IGNORECASE)),

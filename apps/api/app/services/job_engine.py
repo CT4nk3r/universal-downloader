@@ -32,10 +32,11 @@ their concrete implementations. Sibling jobs MUST satisfy these signatures::
 from __future__ import annotations
 
 import base64
+import contextlib
 import json
 import logging
 from collections.abc import AsyncIterator, Awaitable, Callable
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 from uuid import UUID, uuid4
@@ -88,8 +89,7 @@ class YtdlpAdapter(Protocol):
         self,
         job: Job,
         progress_cb: Callable[[JobProgress], Awaitable[None]],
-    ) -> Path:
-        ...
+    ) -> Path: ...
 
 
 @runtime_checkable
@@ -114,7 +114,7 @@ class FileStore(Protocol):
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _encode_cursor(created_at: datetime, job_id: UUID) -> str:
@@ -127,7 +127,7 @@ def _decode_cursor(cursor: str) -> tuple[datetime, UUID] | None:
         padded = cursor + "=" * (-len(cursor) % 4)
         data = json.loads(base64.urlsafe_b64decode(padded.encode()).decode())
         return datetime.fromisoformat(data["t"]), UUID(data["id"])
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None
 
 
@@ -155,7 +155,7 @@ def _dict_to_event(payload: dict[str, Any]) -> Any:
             return JobEventDone.model_validate(payload)
         if kind == "error":
             return JobEventError.model_validate(payload)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.warning("job_engine: failed to parse event %r (%s)", payload, exc)
     return payload
 
@@ -189,17 +189,15 @@ class JobEngine:
         try:
             settings = RedisSettings.from_dsn(get_settings().REDIS_URL)
             self._pool = await create_pool(settings)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             log.warning("job_engine: failed to connect to arq redis (%s)", exc)
             self._pool = None
         return self._pool
 
     async def close(self) -> None:
         if self._pool is not None:
-            try:
+            with contextlib.suppress(Exception):  # pragma: no cover
                 await self._pool.close()
-            except Exception:  # pragma: no cover
-                pass
             self._pool = None
 
     # -- create ---------------------------------------------------------
@@ -236,7 +234,7 @@ class JobEngine:
                     _job_id=str(job_id),
                     _queue_name=_QUEUE_NAME,
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("job_engine: enqueue failed for %s (%s)", job_id, exc)
 
         job = _row_to_job(row)
@@ -311,7 +309,7 @@ class JobEngine:
         if pool is not None:
             try:
                 await pool.abort_job(str(job_id))
-            except Exception as exc:  # noqa: BLE001 - abort is best-effort
+            except Exception as exc:
                 log.debug("job_engine: abort_job %s failed (%s)", job_id, exc)
 
         await self.publish_event(JobEventStatus(job_id=str(job_id), status=JobStatus(CANCELLED)))
@@ -372,9 +370,7 @@ class JobEngine:
             await session.refresh(row)
             job = _row_to_job(row)
 
-        await self.publish_event(
-            JobEventStatus(job_id=str(job_id), status=JobStatus(new_status))
-        )
+        await self.publish_event(JobEventStatus(job_id=str(job_id), status=JobStatus(new_status)))
         return job
 
     async def update_progress(self, job_id: UUID, progress: JobProgress) -> None:

@@ -61,7 +61,9 @@ class UnauthorizedError(APIError):
 # ---------------------------------------------------------------------------
 
 
-def error_envelope(code: str, message: str, details: dict[str, Any] | None = None) -> dict[str, Any]:
+def error_envelope(
+    code: str, message: str, details: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Build the `{ "error": { code, message, details } }` envelope."""
     payload: dict[str, Any] = {"code": code, "message": message}
     if details:
@@ -69,7 +71,9 @@ def error_envelope(code: str, message: str, details: dict[str, Any] | None = Non
     return {"error": payload}
 
 
-def _json_error(status_code: int, code: str, message: str, details: dict[str, Any] | None = None) -> JSONResponse:
+def _json_error(
+    status_code: int, code: str, message: str, details: dict[str, Any] | None = None
+) -> JSONResponse:
     return JSONResponse(status_code=status_code, content=error_envelope(code, message, details))
 
 

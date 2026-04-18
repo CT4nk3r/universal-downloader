@@ -24,6 +24,20 @@ src = ["app"]
 select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "SIM", "RUF"]
 ignore = ["E501"]
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's Depends/Query/Path/etc. are idiomatic as default-argument calls.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Body",
+    "fastapi.Form",
+    "fastapi.File",
+    "fastapi.Security",
+]
+
 [tool.ruff.lint.per-file-ignores]
 "app/models/generated.py" = ["ALL"]
 

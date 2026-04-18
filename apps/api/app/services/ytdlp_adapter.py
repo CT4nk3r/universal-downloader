@@ -47,8 +47,10 @@ selector is further refined to prefer that extension (see
 from __future__ import annotations
 
 import asyncio
+import contextlib
+from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Awaitable, Callable
+from typing import TYPE_CHECKING, Any
 
 from app.errors import UnsupportedSiteError, UpstreamError
 from app.models import (
@@ -288,19 +290,19 @@ def _hook_to_progress(hook: dict[str, Any]) -> JobProgress | None:
     frag_count = hook.get("fragment_count")
 
     percent: float | None = None
-    if isinstance(downloaded, (int, float)) and isinstance(total, (int, float)) and total > 0:
+    if isinstance(downloaded, int | float) and isinstance(total, int | float) and total > 0:
         percent = max(0.0, min(100.0, (float(downloaded) / float(total)) * 100.0))
     elif status == "finished":
         percent = 100.0
 
     return JobProgress(
         percent=percent,
-        downloaded_bytes=int(downloaded) if isinstance(downloaded, (int, float)) else None,
-        total_bytes=int(total) if isinstance(total, (int, float)) else None,
-        speed_bps=float(speed) if isinstance(speed, (int, float)) else None,
-        eta_seconds=int(eta) if isinstance(eta, (int, float)) else None,
-        fragment_index=int(frag_idx) if isinstance(frag_idx, (int, float)) else None,
-        fragment_count=int(frag_count) if isinstance(frag_count, (int, float)) else None,
+        downloaded_bytes=int(downloaded) if isinstance(downloaded, int | float) else None,
+        total_bytes=int(total) if isinstance(total, int | float) else None,
+        speed_bps=float(speed) if isinstance(speed, int | float) else None,
+        eta_seconds=int(eta) if isinstance(eta, int | float) else None,
+        fragment_index=int(frag_idx) if isinstance(frag_idx, int | float) else None,
+        fragment_count=int(frag_count) if isinstance(frag_count, int | float) else None,
     )
 
 
@@ -365,7 +367,7 @@ class YtdlpAdapterImpl:
                 str(exc),
                 details={"code": "extractor_failed", "url": url},
             ) from exc
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise UpstreamError(
                 f"Probe failed: {exc}",
                 details={"code": "extractor_failed", "url": url},
@@ -397,10 +399,10 @@ class YtdlpAdapterImpl:
                 fut = asyncio.run_coroutine_threadsafe(progress_cb(progress), loop)
                 # Don't block the download thread waiting for the SSE bus.
                 fut.result(timeout=0.001)
-            except (TimeoutError, asyncio.TimeoutError):
+            except TimeoutError:
                 # Delivery is best-effort — drop late acks.
                 pass
-            except Exception:  # noqa: BLE001
+            except Exception:
                 # Never let a progress-callback failure abort the download.
                 pass
 
@@ -432,7 +434,7 @@ class YtdlpAdapterImpl:
                 str(exc),
                 details={"code": "extractor_failed", "url": req.url, "job_id": job.id},
             ) from exc
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise UpstreamError(
                 f"Download failed: {exc}",
                 details={"code": "extractor_failed", "url": req.url, "job_id": job.id},
@@ -440,11 +442,9 @@ class YtdlpAdapterImpl:
 
         output = _resolve_output_path(info, job_dir)
         # Emit a final 100% progress event so consumers always see completion.
-        try:
+        with contextlib.suppress(Exception):
             await progress_cb(JobProgress(percent=100.0))
-        except Exception:  # noqa: BLE001
-            pass
         return output
 
 
-__all__ = ["YtdlpAdapterImpl", "ProgressCallback"]
+__all__ = ["ProgressCallback", "YtdlpAdapterImpl"]

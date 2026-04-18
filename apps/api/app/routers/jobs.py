@@ -121,9 +121,7 @@ async def stream_job_events(job_id: str, engine: JobEngineDep) -> EventSourceRes
 
 
 @router.get("/{job_id}/file", summary="Download the completed file (Range supported)")
-async def download_job_file(
-    job_id: str, request: Request, engine: JobEngineDep
-) -> Response:
+async def download_job_file(job_id: str, request: Request, engine: JobEngineDep) -> Response:
     job: Job | None = await engine.get_job(job_id)
     if job is None:
         raise JobNotFoundError("Job not found", details={"id": job_id})

@@ -14,20 +14,20 @@ Tasks
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
 
 from app.models import (  # type: ignore[attr-defined]
+    JobErrorInfo,
     JobEventDone,
     JobEventError,
-    JobErrorInfo,
     JobFile,
     JobProgress,
 )
 from app.settings import get_settings
 
 from .cleanup import cleanup_expired
-from .db import get_session_factory, init_db, JobRow
+from .db import JobRow, get_session_factory, init_db
 from .job_engine import engine
 from .state_machine import (
     DOWNLOADING,
@@ -77,7 +77,7 @@ def _load_file_store() -> Any:
 # ---------------------------------------------------------------------------
 
 
-async def run_download(ctx: dict[str, Any], job_id: str) -> None:  # noqa: C901
+async def run_download(ctx: dict[str, Any], job_id: str) -> None:
     """End-to-end pipeline for a single download job."""
     jid = UUID(job_id)
 
@@ -97,7 +97,7 @@ async def run_download(ctx: dict[str, Any], job_id: str) -> None:  # noqa: C901
         await engine.update_status(jid, PROBING)
         adapter = _load_ytdlp_adapter()
         probe = await adapter.probe(row.url)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         await _fail(jid, "probe_failed", str(exc))
         return
 
@@ -130,7 +130,7 @@ async def run_download(ctx: dict[str, Any], job_id: str) -> None:  # noqa: C901
             await engine.update_progress(jid, p)
 
         src_path = await adapter.download(fresh_job, progress_cb)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         await _fail(jid, "download_failed", str(exc))
         return
 
@@ -151,7 +151,7 @@ async def run_download(ctx: dict[str, Any], job_id: str) -> None:  # noqa: C901
 
         await engine.update_status(jid, READY, file=job_file)
         await engine.publish_event(JobEventDone(job_id=str(jid), file=job_file))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         await _fail(jid, "finalize_failed", str(exc))
         return
 
@@ -161,7 +161,7 @@ async def _fail(job_id: UUID, code: str, message: str) -> None:
     err = JobErrorInfo(code=code, message=message)
     try:
         await engine.update_status(job_id, FAILED, error=err.model_dump(mode="json"))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.exception("worker: failed to mark job %s failed (%s)", job_id, exc)
     try:
         await engine.publish_event(JobEventError(job_id=str(job_id), error=err))
@@ -209,7 +209,7 @@ def _cron_jobs() -> list[Any]:
 class WorkerSettings:
     """arq ``WorkerSettings`` for ``app.services.worker``."""
 
-    functions = [run_download, cleanup_expired]
+    functions: ClassVar[list[Any]] = [run_download, cleanup_expired]
     on_startup = startup
     on_shutdown = shutdown
     queue_name = _QUEUE_NAME

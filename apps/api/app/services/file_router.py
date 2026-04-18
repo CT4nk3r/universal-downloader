@@ -129,7 +129,9 @@ def _parse_range(header: str | None, size: int) -> tuple[int, int] | None:
 
 async def _load_job(job_id: UUID) -> JobRow:
     async with session_scope() as session:
-        row = (await session.execute(select(JobRow).where(JobRow.id == job_id))).scalar_one_or_none()
+        row = (
+            await session.execute(select(JobRow).where(JobRow.id == job_id))
+        ).scalar_one_or_none()
     if row is None:
         raise JobNotFoundError(f"Job {job_id} not found")
     return row

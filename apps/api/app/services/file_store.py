@@ -100,6 +100,7 @@ class LocalFileStore:
         # skip the move; otherwise perform an atomic rename when possible
         # and fall back to copy+unlink across filesystems.
         if src.resolve() != dest.resolve():
+
             def _move() -> None:
                 try:
                     src.replace(dest)
@@ -146,7 +147,7 @@ class LocalFileStore:
         meta_path = self._meta_path(job_id)
         if not await asyncio.to_thread(meta_path.is_file):
             return None
-        async with aiofiles.open(meta_path, "r", encoding="utf-8") as fh:
+        async with aiofiles.open(meta_path, encoding="utf-8") as fh:
             data = json.loads(await fh.read())
         path = self._job_dir(job_id) / data["filename"]
         if not await asyncio.to_thread(path.is_file):

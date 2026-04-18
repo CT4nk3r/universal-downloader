@@ -9,10 +9,12 @@ without a Redis dependency.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import os
-from typing import Any, AsyncIterator
+from collections.abc import AsyncIterator
+from typing import Any
 
 try:  # pragma: no cover - import side effect
     from redis import asyncio as aioredis  # type: ignore[import-not-found]
@@ -114,7 +116,7 @@ class SSEBus:
                 await client.ping()
                 self._redis = client
                 return self._redis
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.warning("sse_bus: redis unreachable (%s); falling back to in-memory", exc)
                 self._fallback = True
                 return None
@@ -128,7 +130,7 @@ class SSEBus:
             return
         try:
             await client.publish(channel, payload)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             log.warning("sse_bus: redis publish failed (%s); using in-memory", exc)
             self._fallback = True
             self._redis = None
@@ -153,7 +155,7 @@ class SSEBus:
                 data = message.get("data")
                 if data is None:
                     continue
-                if isinstance(data, (bytes, bytearray)):
+                if isinstance(data, bytes | bytearray):
                     data = data.decode("utf-8", errors="replace")
                 try:
                     yield json.loads(data)
@@ -169,10 +171,8 @@ class SSEBus:
     async def close(self) -> None:
         """Close the underlying Redis connection, if any."""
         if self._redis is not None:
-            try:
+            with contextlib.suppress(Exception):  # pragma: no cover
                 await self._redis.close()
-            except Exception:  # pragma: no cover
-                pass
             self._redis = None
 
 

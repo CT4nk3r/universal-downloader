@@ -8,8 +8,10 @@ app can boot before codegen has run.
 from __future__ import annotations
 
 try:  # pragma: no cover - exercised by codegen presence
-    from .generated import *  # type: ignore[no-redef]  # noqa: F401,F403
+    from .generated import *  # type: ignore[no-redef]  # noqa: F403
+
     _SOURCE = "generated"
 except ImportError:  # pragma: no cover
-    from .api_models import *  # type: ignore[no-redef]  # noqa: F401,F403
+    from .api_models import *  # type: ignore[no-redef]  # noqa: F403
+
     _SOURCE = "stub"
