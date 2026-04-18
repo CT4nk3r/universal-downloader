@@ -19,11 +19,20 @@ from sse_starlette.sse import EventSourceResponse
 
 from ..errors import JobNotFoundError, JobNotReadyError, UnsupportedSiteError
 from ..logging_config import get_logger
-from ..models import CreateJobRequest, Job, JobList, JobStatus
+from ..models import CreateJobRequest, Error, Job, JobList, JobStatus
 from ..utils import detect_site
 
 router = APIRouter(tags=["jobs"], prefix="/jobs")
 log = get_logger(__name__)
+
+# Shared error responses so FastAPI documents them in the generated
+# OpenAPI spec (consumed by the schemathesis contract job).
+_ERR_400: dict[int | str, dict[str, Any]] = {400: {"model": Error, "description": "Bad request"}}
+_ERR_404: dict[int | str, dict[str, Any]] = {404: {"model": Error, "description": "Not found"}}
+_ERR_409: dict[int | str, dict[str, Any]] = {409: {"model": Error, "description": "Conflict"}}
+_ERR_422: dict[int | str, dict[str, Any]] = {
+    422: {"model": Error, "description": "Unprocessable entity"}
+}
 
 
 # ---------------------------------------------------------------------------
@@ -64,6 +73,7 @@ JobEngineDep = Annotated[Any, Depends(get_job_engine)]
     response_model=Job,
     status_code=status.HTTP_202_ACCEPTED,
     summary="Create a new download job",
+    responses={**_ERR_400, **_ERR_422},
 )
 async def create_job(payload: CreateJobRequest, engine: JobEngineDep) -> Job:
     site = detect_site(str(payload.url))
@@ -76,7 +86,12 @@ async def create_job(payload: CreateJobRequest, engine: JobEngineDep) -> Job:
     return job
 
 
-@router.get("", response_model=JobList, summary="List download jobs")
+@router.get(
+    "",
+    response_model=JobList,
+    summary="List download jobs",
+    responses={**_ERR_400},
+)
 async def list_jobs(
     engine: JobEngineDep,
     status_filter: JobStatus | None = Query(default=None, alias="status"),
@@ -87,7 +102,12 @@ async def list_jobs(
     return result
 
 
-@router.get("/{job_id}", response_model=Job, summary="Get job by id")
+@router.get(
+    "/{job_id}",
+    response_model=Job,
+    summary="Get job by id",
+    responses={**_ERR_404},
+)
 async def get_job(job_id: str, engine: JobEngineDep) -> Job:
     job: Job | None = await engine.get_job(job_id)
     if job is None:
@@ -99,6 +119,7 @@ async def get_job(job_id: str, engine: JobEngineDep) -> Job:
     "/{job_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Cancel a running job or delete an artifact",
+    responses={**_ERR_404},
 )
 async def delete_job(job_id: str, engine: JobEngineDep) -> Response:
     deleted: bool = await engine.delete_job(job_id)
@@ -107,7 +128,11 @@ async def delete_job(job_id: str, engine: JobEngineDep) -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/{job_id}/events", summary="Server-Sent Events stream of job progress")
+@router.get(
+    "/{job_id}/events",
+    summary="Server-Sent Events stream of job progress",
+    responses={**_ERR_404},
+)
 async def stream_job_events(job_id: str, engine: JobEngineDep) -> EventSourceResponse:
     job: Job | None = await engine.get_job(job_id)
     if job is None:
@@ -120,7 +145,11 @@ async def stream_job_events(job_id: str, engine: JobEngineDep) -> EventSourceRes
     return EventSourceResponse(_iterator())
 
 
-@router.get("/{job_id}/file", summary="Download the completed file (Range supported)")
+@router.get(
+    "/{job_id}/file",
+    summary="Download the completed file (Range supported)",
+    responses={**_ERR_404, **_ERR_409},
+)
 async def download_job_file(job_id: str, request: Request, engine: JobEngineDep) -> Response:
     job: Job | None = await engine.get_job(job_id)
     if job is None:

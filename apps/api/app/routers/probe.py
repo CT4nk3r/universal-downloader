@@ -6,7 +6,7 @@ from fastapi import APIRouter, status
 
 from ..errors import UnsupportedSiteError, UpstreamError
 from ..logging_config import get_logger
-from ..models import ProbeRequest, ProbeResult
+from ..models import Error, ProbeRequest, ProbeResult
 from ..utils import detect_site
 
 router = APIRouter(tags=["probe"])
@@ -18,6 +18,11 @@ log = get_logger(__name__)
     response_model=ProbeResult,
     status_code=status.HTTP_200_OK,
     summary="Inspect a URL for available formats and metadata",
+    responses={
+        400: {"model": Error, "description": "Bad request"},
+        422: {"model": Error, "description": "Unprocessable entity"},
+        502: {"model": Error, "description": "Upstream error"},
+    },
 )
 async def probe_url(payload: ProbeRequest) -> ProbeResult:
     site = detect_site(str(payload.url))
