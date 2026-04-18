@@ -134,6 +134,8 @@ jobs:
           path: |
             packages/e2e-web/playwright-report/**
             packages/e2e-web/test-results/**
+            tests/e2e-web/playwright-report/**
+            tests/e2e-web/test-results/**
             web-preview.log
           if-no-files-found: ignore
           retention-days: 14
@@ -217,6 +219,9 @@ jobs:
             packages/e2e-desktop/test-results/**
             packages/e2e-desktop/screenshots/**
             packages/e2e-desktop/logs/**
+            tests/e2e-desktop/test-results/**
+            tests/e2e-desktop/screenshots/**
+            tests/e2e-desktop/logs/**
           if-no-files-found: ignore
           retention-days: 14
 
@@ -304,5 +309,8 @@ jobs:
             packages/e2e-desktop/test-results/**
             packages/e2e-desktop/screenshots/**
             packages/e2e-desktop/logs/**
+            tests/e2e-desktop/test-results/**
+            tests/e2e-desktop/screenshots/**
+            tests/e2e-desktop/logs/**
           if-no-files-found: ignore
           retention-days: 14
