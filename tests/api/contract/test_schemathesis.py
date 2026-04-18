@@ -104,7 +104,8 @@ def test_api_conforms_to_openapi(case: Case, app) -> None:
     headers.setdefault(
         "Authorization", f"Bearer {os.environ.get('UD_API_KEY', '')}"
     )
-    response = case.call_asgi(app=app, headers=headers)
+    case.headers = headers
+    response = case.call_asgi(app=app)
     case.validate_response(
         response,
         checks=(

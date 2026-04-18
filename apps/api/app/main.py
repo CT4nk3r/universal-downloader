@@ -55,6 +55,15 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
         data_dir=str(settings.DATA_DIR),
     )
 
+    # Ensure the jobs table exists. ``init_db`` is idempotent; skipped in
+    # tests that use a fake engine via ``app.state.job_engine``.
+    try:
+        from .services.db import init_db
+
+        await init_db()
+    except Exception as exc:  # pragma: no cover - defensive
+        log.warning("db_init_failed", error=str(exc))
+
     try:
         yield
     finally:

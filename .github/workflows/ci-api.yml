@@ -80,7 +80,6 @@ jobs:
     env:
       UD_REDIS_URL: redis://localhost:6379/0
       REDIS_URL: redis://localhost:6379/0
-      UD_API_KEY: test-ci-api-key-please-change
     defaults:
       run:
         working-directory: apps/api
