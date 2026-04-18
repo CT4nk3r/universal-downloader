@@ -12,7 +12,7 @@ from typing import Any
 
 from sqlalchemy import select
 
-from app.models import JobStatus  # type: ignore[attr-defined]
+from app.models import JobStatus
 
 from .db import JobRow, get_session_factory
 from .state_machine import EXPIRED, READY, validate_transition
@@ -39,9 +39,9 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
     async with factory() as session:
         stmt = (
             select(JobRow)
-            .where(JobRow.status == READY)
-            .where(JobRow.expires_at.is_not(None))
-            .where(JobRow.expires_at <= now)
+            .where(JobRow.status == READY)  # type: ignore[arg-type]
+            .where(JobRow.expires_at.is_not(None))  # type: ignore[union-attr]
+            .where(JobRow.expires_at <= now)  # type: ignore[arg-type,operator]
         )
         result = await session.execute(stmt)
         rows = list(result.scalars().all())
@@ -51,7 +51,7 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
 
         if file_store is None:
             try:
-                from . import file_store as fs_mod  # type: ignore[import-not-found]
+                from . import file_store as fs_mod
 
                 file_store = getattr(fs_mod, "store", None) or fs_mod.LocalFileStore()
             except Exception as exc:
@@ -79,7 +79,7 @@ async def cleanup_expired(ctx: dict[str, Any] | None = None) -> int:
         # Publish status events on a best-effort basis so live SSE clients learn
         # about the expiration too.
         try:
-            from app.models import JobEventStatus  # type: ignore[attr-defined]
+            from app.models import JobEventStatus
 
             from .job_engine import engine
 

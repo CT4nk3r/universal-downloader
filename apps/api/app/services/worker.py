@@ -17,7 +17,7 @@ import logging
 from typing import Any, ClassVar
 from uuid import UUID
 
-from app.models import (  # type: ignore[attr-defined]
+from app.models import (
     JobErrorInfo,
     JobEventDone,
     JobEventError,
@@ -50,20 +50,20 @@ _QUEUE_NAME = "ud:queue"
 
 def _load_ytdlp_adapter() -> Any:
     """Import the J1.3 yt-dlp adapter lazily so the worker boots in isolation."""
-    from . import ytdlp_adapter as mod  # type: ignore[import-not-found]
+    from . import ytdlp_adapter as mod
 
     # Prefer a module-level singleton named ``adapter``; fall back to a
     # class named ``YtdlpAdapter``.
     if hasattr(mod, "adapter"):
         return mod.adapter
     if hasattr(mod, "YtdlpAdapter"):
-        return mod.YtdlpAdapter()  # type: ignore[call-arg]
+        return mod.YtdlpAdapter()
     raise RuntimeError("ytdlp_adapter module exposes neither `adapter` nor `YtdlpAdapter`")
 
 
 def _load_file_store() -> Any:
     """Import the J1.4 file store lazily."""
-    from . import file_store as mod  # type: ignore[import-not-found]
+    from . import file_store as mod
 
     if hasattr(mod, "store"):
         return mod.store
@@ -191,7 +191,7 @@ async def shutdown(ctx: dict[str, Any]) -> None:
 
 
 def _redis_settings() -> Any:
-    from arq.connections import RedisSettings  # type: ignore[import-not-found]
+    from arq.connections import RedisSettings
 
     return RedisSettings.from_dsn(get_settings().REDIS_URL)
 
@@ -199,7 +199,7 @@ def _redis_settings() -> Any:
 def _cron_jobs() -> list[Any]:
     """Optional cron — silently disabled if arq's cron helper is unavailable."""
     try:
-        from arq import cron  # type: ignore[import-not-found]
+        from arq import cron
     except Exception:  # pragma: no cover
         return []
     # Every 30 minutes, on the half-hour.

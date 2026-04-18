@@ -219,3 +219,61 @@ async def download_file(
         media_type=meta.mime_type,
         headers=common_headers,
     )
+
+
+async def serve_job_file(request: Request, job: object) -> StreamingResponse:
+    """Thin wrapper reused by ``routers.jobs`` to stream a ready job's file.
+
+    ``routers.jobs`` has already validated job existence and ``ready`` state,
+    so this helper focuses on Range parsing + streaming. Auth is delegated
+    to the API-level Bearer middleware (the signed-URL flow goes through
+    :func:`download_file` directly).
+    """
+    job_id_raw = getattr(job, "id", None)
+    if job_id_raw is None:
+        raise JobNotFoundError("Job missing id")
+    job_id = job_id_raw if isinstance(job_id_raw, UUID) else UUID(str(job_id_raw))
+
+    range_header = request.headers.get("range") or request.headers.get("Range")
+
+    meta = await _store.get_meta(job_id)
+    if meta is None:
+        raise JobNotFoundError(f"No stored file for job {job_id}")
+
+    size = meta.size_bytes
+    try:
+        rng = _parse_range(range_header, size)
+    except ValueError:
+        return StreamingResponse(
+            iter(()),
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            headers={"Content-Range": f"bytes */{size}", "Accept-Ranges": "bytes"},
+            media_type=meta.mime_type,
+        )
+
+    common_headers: dict[str, str] = {
+        "Accept-Ranges": "bytes",
+        "Content-Disposition": f'attachment; filename="{meta.filename}"',
+        "X-Content-SHA256": meta.sha256,
+    }
+
+    if rng is None:
+        gen, _ = await _store.open_range(job_id, None, None)
+        common_headers["Content-Length"] = str(size)
+        return StreamingResponse(
+            gen,
+            status_code=status.HTTP_200_OK,
+            media_type=meta.mime_type,
+            headers=common_headers,
+        )
+
+    start, end = rng
+    gen, _ = await _store.open_range(job_id, start, end)
+    common_headers["Content-Length"] = str(end - start + 1)
+    common_headers["Content-Range"] = f"bytes {start}-{end}/{size}"
+    return StreamingResponse(
+        gen,
+        status_code=status.HTTP_206_PARTIAL_CONTENT,
+        media_type=meta.mime_type,
+        headers=common_headers,
+    )

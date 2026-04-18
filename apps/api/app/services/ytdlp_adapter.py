@@ -181,7 +181,7 @@ def _build_download_ranges(time_range: TimeRange | None) -> Any | None:
     if start is None and end is None:
         return None
     try:
-        from yt_dlp.utils import download_range_func  # type: ignore[import-not-found]
+        from yt_dlp.utils import download_range_func
     except ImportError:  # pragma: no cover - yt-dlp must be installed
         return None
     span_start = float(start) if start is not None else 0.0
@@ -321,7 +321,7 @@ class YtdlpAdapterImpl:
     def __init__(self) -> None:
         # Import lazily so that unit tests of pure helpers don't require yt-dlp.
         try:
-            import yt_dlp  # type: ignore[import-not-found]
+            import yt_dlp
         except ImportError as exc:  # pragma: no cover - dependency is required at runtime
             raise RuntimeError(
                 "yt-dlp is not installed; install it via `pip install yt-dlp`."
@@ -357,12 +357,12 @@ class YtdlpAdapterImpl:
             raise
         except UnsupportedSiteError:
             raise
-        except self._yt_dlp.utils.DownloadError as exc:  # type: ignore[attr-defined]
+        except self._yt_dlp.utils.DownloadError as exc:
             raise UpstreamError(
                 str(exc),
                 details={"code": "extractor_failed", "url": url},
             ) from exc
-        except self._yt_dlp.utils.ExtractorError as exc:  # type: ignore[attr-defined]
+        except self._yt_dlp.utils.ExtractorError as exc:
             raise UpstreamError(
                 str(exc),
                 details={"code": "extractor_failed", "url": url},
@@ -396,7 +396,8 @@ class YtdlpAdapterImpl:
             if progress is None:
                 return
             try:
-                fut = asyncio.run_coroutine_threadsafe(progress_cb(progress), loop)
+                coro = progress_cb(progress)
+                fut: asyncio.Future[None] = asyncio.run_coroutine_threadsafe(coro, loop)  # type: ignore[arg-type]
                 # Don't block the download thread waiting for the SSE bus.
                 fut.result(timeout=0.001)
             except TimeoutError:
@@ -424,12 +425,12 @@ class YtdlpAdapterImpl:
             raise
         except UnsupportedSiteError:
             raise
-        except self._yt_dlp.utils.DownloadError as exc:  # type: ignore[attr-defined]
+        except self._yt_dlp.utils.DownloadError as exc:
             raise UpstreamError(
                 str(exc),
                 details={"code": "extractor_failed", "url": req.url, "job_id": job.id},
             ) from exc
-        except self._yt_dlp.utils.ExtractorError as exc:  # type: ignore[attr-defined]
+        except self._yt_dlp.utils.ExtractorError as exc:
             raise UpstreamError(
                 str(exc),
                 details={"code": "extractor_failed", "url": req.url, "job_id": job.id},

@@ -29,7 +29,7 @@ async def probe_url(payload: ProbeRequest) -> ProbeResult:
 
     # Lazy import: J1.3 owns this module. Until it lands the API still boots.
     try:
-        from ..services.ytdlp_adapter import YtdlpAdapterImpl  # type: ignore[import-not-found]
+        from ..services.ytdlp_adapter import YtdlpAdapterImpl
     except ImportError as exc:
         log.warning("ytdlp_adapter_unavailable", error=str(exc))
         raise UpstreamError(

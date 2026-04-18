@@ -30,11 +30,10 @@ from sqlmodel import JSON, Column, Field, SQLModel, String
 # ---------------------------------------------------------------------------
 
 try:  # pragma: no cover - depends on sibling job
-    from app.settings import settings as _settings  # type: ignore[import-not-found]
+    from app.settings import get_settings
 
-    _DB_URL: str = getattr(_settings, "UD_DATABASE_URL", "")
+    _DB_URL: str = getattr(get_settings(), "DATABASE_URL", "")
 except Exception:  # pragma: no cover
-    _settings = None
     _DB_URL = ""
 
 if not _DB_URL:

@@ -44,7 +44,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import select
 
 from app.errors import JobNotFoundError
-from app.models import (  # type: ignore[attr-defined]
+from app.models import (
     CreateJobRequest,
     Job,
     JobEventDone,
@@ -137,7 +137,8 @@ def _row_to_job(row: JobRow) -> Job:
 
 def _event_to_dict(event: Any) -> dict[str, Any]:
     if hasattr(event, "model_dump"):
-        return event.model_dump(mode="json")
+        dumped: dict[str, Any] = event.model_dump(mode="json")
+        return dumped
     if isinstance(event, dict):
         return event
     raise TypeError(f"Unsupported event type: {type(event)!r}")
@@ -181,8 +182,8 @@ class JobEngine:
         if self._pool is not None:
             return self._pool
         try:
-            from arq import create_pool  # type: ignore[import-not-found]
-            from arq.connections import RedisSettings  # type: ignore[import-not-found]
+            from arq import create_pool
+            from arq.connections import RedisSettings
         except Exception as exc:  # pragma: no cover
             log.warning("job_engine: arq unavailable (%s)", exc)
             return None
@@ -260,17 +261,17 @@ class JobEngine:
         limit = max(1, min(int(limit), 200))
         factory = get_session_factory()
 
-        stmt = select(JobRow).order_by(JobRow.created_at.desc(), JobRow.id.desc())
+        stmt = select(JobRow).order_by(JobRow.created_at.desc(), JobRow.id.desc())  # type: ignore[attr-defined]
         if status is not None:
             value = getattr(status, "value", status)
-            stmt = stmt.where(JobRow.status == value)
+            stmt = stmt.where(JobRow.status == value)  # type: ignore[arg-type]
 
         if cursor:
             decoded = _decode_cursor(cursor)
             if decoded is not None:
                 cur_t, cur_id = decoded
                 stmt = stmt.where(
-                    (JobRow.created_at < cur_t)
+                    (JobRow.created_at < cur_t)  # type: ignore[arg-type]
                     | ((JobRow.created_at == cur_t) & (JobRow.id < cur_id))
                 )
 

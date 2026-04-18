@@ -39,14 +39,14 @@ async def get_job_engine(request: Request) -> Any:
     if engine is not None:
         return engine
     try:
-        from ..services.job_engine import JobEngine  # type: ignore[import-not-found]
+        from ..services.job_engine import JobEngine
     except ImportError as exc:  # pragma: no cover - depends on J1.2
         raise JobNotFoundError(
             "Job engine not available (J1.2 not yet wired)",
             details={"reason": "service_not_implemented"},
         ) from exc
 
-    engine = JobEngine(redis_url=request.app.state.redis_url, data_dir=None)
+    engine = JobEngine()
     request.app.state.job_engine = engine
     return engine
 
@@ -133,7 +133,7 @@ async def download_job_file(job_id: str, request: Request, engine: JobEngineDep)
 
     # Lazy import: J1.4 owns the Range-aware file router.
     try:
-        from ..services.file_router import serve_job_file  # type: ignore[import-not-found]
+        from ..services.file_router import serve_job_file
     except ImportError as exc:  # pragma: no cover - depends on J1.4
         raise JobNotReadyError(
             "File router not available (J1.4 not yet wired)",

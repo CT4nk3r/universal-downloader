@@ -17,16 +17,15 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 try:  # pragma: no cover - import side effect
-    from redis import asyncio as aioredis  # type: ignore[import-not-found]
+    from redis import asyncio as aioredis
 except Exception:  # pragma: no cover
     aioredis = None  # type: ignore[assignment]
 
 try:  # pragma: no cover - depends on sibling job
-    from app.settings import settings as _settings  # type: ignore[import-not-found]
+    from app.settings import get_settings
 
-    _REDIS_URL: str = getattr(_settings, "UD_REDIS_URL", "")
+    _REDIS_URL: str = getattr(get_settings(), "REDIS_URL", "")
 except Exception:  # pragma: no cover
-    _settings = None
     _REDIS_URL = ""
 
 if not _REDIS_URL:

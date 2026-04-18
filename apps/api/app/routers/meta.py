@@ -58,7 +58,7 @@ _SITES: tuple[Site, ...] = (
 
 def _probe_ytdlp_version() -> str | None:
     try:
-        import yt_dlp  # type: ignore[import-untyped]
+        import yt_dlp
 
         return str(getattr(yt_dlp.version, "__version__", "unknown"))
     except Exception as exc:  # pragma: no cover - optional at boot time
