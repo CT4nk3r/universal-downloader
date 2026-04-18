@@ -360,6 +360,28 @@ def temp_artifact(tmp_path: Path) -> Path:
     return p
 
 
+@pytest.fixture(autouse=True)
+def _reset_sse_app_status() -> Iterator[None]:
+    """Reset ``sse_starlette``'s module-level ``AppStatus.should_exit_event``.
+
+    ``sse_starlette`` binds this ``asyncio.Event`` to the first event loop
+    that touches it. ``starlette.testclient`` spins up a fresh loop per
+    request, so across tests we'd see
+    ``RuntimeError: Event bound to a different event loop``. Clearing the
+    reference before each test forces a lazy rebind on the current loop.
+    """
+    try:
+        from sse_starlette.sse import AppStatus  # type: ignore[import-not-found]
+    except ImportError:
+        yield
+        return
+    AppStatus.should_exit_event = None  # type: ignore[attr-defined]
+    try:
+        yield
+    finally:
+        AppStatus.should_exit_event = None  # type: ignore[attr-defined]
+
+
 @pytest.fixture()
 def app(
     fake_engine: FakeJobEngine,
