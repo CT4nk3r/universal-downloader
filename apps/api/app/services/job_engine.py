@@ -117,6 +117,22 @@ def _utcnow() -> datetime:
     return datetime.now(UTC)
 
 
+def _coerce_uuid(job_id: Any) -> UUID:
+    """Coerce ``job_id`` to UUID or raise :class:`JobNotFoundError`.
+
+    Callers frequently receive path parameters as ``str``; passing a
+    non-UUID string into SQLAlchemy's ``Uuid`` column type triggers
+    ``AttributeError: 'str' object has no attribute 'hex'``. Surface those
+    as a 404 instead of a 500.
+    """
+    if isinstance(job_id, UUID):
+        return job_id
+    try:
+        return UUID(str(job_id))
+    except (ValueError, AttributeError, TypeError) as exc:
+        raise JobNotFoundError(f"job {job_id!r} not found") from exc
+
+
 def _encode_cursor(created_at: datetime, job_id: UUID) -> str:
     raw = json.dumps({"t": created_at.isoformat(), "id": str(job_id)}).encode()
     return base64.urlsafe_b64encode(raw).decode().rstrip("=")
@@ -243,12 +259,13 @@ class JobEngine:
         return job
 
     # -- get ------------------------------------------------------------
-    async def get_job(self, job_id: UUID) -> Job:
+    async def get_job(self, job_id: UUID | str) -> Job:
+        uid = _coerce_uuid(job_id)
         factory = get_session_factory()
         async with factory() as session:
-            row = await session.get(JobRow, job_id)
+            row = await session.get(JobRow, uid)
             if row is None:
-                raise JobNotFoundError(f"job {job_id} not found")
+                raise JobNotFoundError(f"job {uid} not found")
             return _row_to_job(row)
 
     # -- list -----------------------------------------------------------
@@ -290,13 +307,14 @@ class JobEngine:
         return JobList(items=[_row_to_job(r) for r in rows], next_cursor=next_cursor)
 
     # -- cancel ---------------------------------------------------------
-    async def cancel_job(self, job_id: UUID) -> None:
+    async def cancel_job(self, job_id: UUID | str) -> None:
         """Mark job cancelled (terminal) and best-effort abort the arq task."""
+        uid = _coerce_uuid(job_id)
         factory = get_session_factory()
         async with factory() as session:
-            row = await session.get(JobRow, job_id)
+            row = await session.get(JobRow, uid)
             if row is None:
-                raise JobNotFoundError(f"job {job_id} not found")
+                raise JobNotFoundError(f"job {uid} not found")
             if is_terminal(row.status):
                 return
             assert_transition(row.status, CANCELLED)
@@ -309,11 +327,25 @@ class JobEngine:
         pool = await self._ensure_pool()
         if pool is not None:
             try:
-                await pool.abort_job(str(job_id))
+                await pool.abort_job(str(uid))
             except Exception as exc:
-                log.debug("job_engine: abort_job %s failed (%s)", job_id, exc)
+                log.debug("job_engine: abort_job %s failed (%s)", uid, exc)
 
-        await self.publish_event(JobEventStatus(job_id=str(job_id), status=JobStatus(CANCELLED)))
+        await self.publish_event(JobEventStatus(job_id=str(uid), status=JobStatus(CANCELLED)))
+
+    # -- delete ---------------------------------------------------------
+    async def delete_job(self, job_id: UUID | str) -> bool:
+        """Cancel (if active) and report whether the job existed.
+
+        Returns ``True`` if a job with this id was found (regardless of
+        whether it was already terminal), ``False`` otherwise. Invalid
+        UUIDs return ``False`` so the HTTP layer surfaces a 404.
+        """
+        try:
+            await self.cancel_job(job_id)
+        except JobNotFoundError:
+            return False
+        return True
 
     # -- pub/sub --------------------------------------------------------
     async def publish_event(self, event: Any) -> None:

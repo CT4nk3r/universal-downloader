@@ -76,7 +76,13 @@ class FakeJobEngine:
     def __init__(self) -> None:
         self.jobs: dict[str, dict[str, Any]] = {}
         self._idempotency: dict[str, str] = {}
-        # Per-job event queues for SSE.
+        # Pre-buffered events per-job (populated synchronously by tests
+        # via :meth:`publish`/:meth:`close_stream`). ``subscribe`` moves
+        # these into an asyncio.Queue bound to the running loop so we
+        # never share an Event across loops.
+        self._buffered: dict[str, list[dict[str, Any] | None]] = {}
+        # Active queues keyed by job id; populated inside ``subscribe`` on
+        # the loop that serves the SSE response.
         self._queues: dict[str, asyncio.Queue[dict[str, Any] | None]] = {}
 
     # ------------------------------------------------------------------ CRUD
@@ -149,9 +155,12 @@ class FakeJobEngine:
     # ------------------------------------------------------------------- SSE
 
     async def subscribe(self, job_id: str) -> AsyncIterator[dict[str, Any]]:
-        queue: asyncio.Queue[dict[str, Any] | None] = self._queues.setdefault(
-            str(job_id), asyncio.Queue()
-        )
+        # Bind queue to the currently running loop (ASGI loop) and drain any
+        # events buffered synchronously before the stream was opened.
+        queue: asyncio.Queue[dict[str, Any] | None] = asyncio.Queue()
+        for evt in self._buffered.pop(str(job_id), []):
+            queue.put_nowait(evt)
+        self._queues[str(job_id)] = queue
         # Drain pre-published events synchronously, then await new ones until
         # a sentinel ``None`` arrives.
         while True:
@@ -162,13 +171,20 @@ class FakeJobEngine:
 
     def publish(self, job_id: str, event_type: str, payload: dict[str, Any]) -> None:
         """Test helper: enqueue a JobEvent for a subscribed stream."""
-        queue = self._queues.setdefault(str(job_id), asyncio.Queue())
         body = {"type": event_type, "job_id": str(job_id), **payload}
-        queue.put_nowait({"type": event_type, "data": json.dumps(body)})
+        event = {"type": event_type, "data": json.dumps(body)}
+        queue = self._queues.get(str(job_id))
+        if queue is not None:
+            queue.put_nowait(event)
+        else:
+            self._buffered.setdefault(str(job_id), []).append(event)
 
     def close_stream(self, job_id: str) -> None:
-        queue = self._queues.setdefault(str(job_id), asyncio.Queue())
-        queue.put_nowait(None)
+        queue = self._queues.get(str(job_id))
+        if queue is not None:
+            queue.put_nowait(None)
+        else:
+            self._buffered.setdefault(str(job_id), []).append(None)
 
     # --------------------------------------------------------- direct mutate
 
