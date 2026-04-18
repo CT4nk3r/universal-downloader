@@ -8,6 +8,7 @@ build/
 out/
 .next/
 .turbo/
+storybook-static/
 *.tsbuildinfo
 
 # Python
