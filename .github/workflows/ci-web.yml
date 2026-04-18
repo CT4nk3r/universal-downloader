@@ -55,12 +55,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Vitest (packages/ui)
-        run: pnpm --filter @universal-downloader/ui exec vitest run
-      - name: Vitest (packages/api-client)
-        run: pnpm --filter @universal-downloader/api-client exec vitest run
-      - name: Vitest (packages/core-logic)
-        run: pnpm --filter @universal-downloader/core-logic exec vitest run
+      - name: Unit tests via Turbo
+        run: pnpm -w exec turbo run test --filter=@universal-downloader/ui --filter=@universal-downloader/api-client --filter=@universal-downloader/core-logic
 
   build:
     name: Build Web

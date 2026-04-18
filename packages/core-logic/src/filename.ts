@@ -58,8 +58,10 @@ function graphemes(s: string): string[] {
  * usable name.
  */
 export function sanitizeFilename(name: string, maxLen = 200): string {
-  let out = String(name).normalize('NFC').replace(INVALID_CHARS, '_');
-  out = out.replace(/\s+/g, ' ').trim();
+  // Collapse whitespace (incl. tabs/newlines) first so control-char
+  // replacement below doesn't turn them into underscores.
+  let out = String(name).normalize('NFC').replace(/\s+/g, ' ');
+  out = out.replace(INVALID_CHARS, '_').trim();
   out = out.replace(/^[.\s]+|[.\s]+$/g, '');
 
   if (out === '') return '_';
