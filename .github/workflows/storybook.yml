@@ -25,7 +25,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # Chromatic needs full git history for baseline detection.
           fetch-depth: 0
