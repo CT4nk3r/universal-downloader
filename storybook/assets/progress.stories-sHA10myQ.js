@@ -1,0 +1,9 @@
+import{j as i}from"./jsx-runtime-DFAAy_2V.js";import{r as w}from"./index-Bc2G9s8g.js";import{c as d}from"./cn-BLSKlp9E.js";const s=w.forwardRef(({className:o,value:n=0,max:l=100,indeterminate:t=!1,..._},b)=>{const h=Math.max(0,Math.min(100,n/l*100));return i.jsx("div",{ref:b,role:"progressbar","aria-valuemin":0,"aria-valuemax":l,"aria-valuenow":t?void 0:n,className:d("relative h-2 w-full overflow-hidden rounded-full bg-[rgb(var(--ud-muted))]",o),..._,children:i.jsx("div",{className:d("h-full rounded-full bg-[rgb(var(--ud-primary))] transition-[width] duration-300 ease-out",t&&"absolute left-0 w-1/3 animate-pulse"),style:t?void 0:{width:`${h}%`}})})});s.displayName="Progress";try{s.displayName="Progress",s.__docgenInfo={description:"",displayName:"Progress",props:{value:{defaultValue:{value:"0"},description:"",name:"value",required:!1,type:{name:"number"}},max:{defaultValue:{value:"100"},description:"",name:"max",required:!1,type:{name:"number"}},indeterminate:{defaultValue:{value:"false"},description:"",name:"indeterminate",required:!1,type:{name:"boolean"}}}}}catch{}const q={title:"Components/Progress",component:s,args:{value:42}},e={},r={args:{value:100}},a={args:{indeterminate:!0}};var m,u,c;e.parameters={...e.parameters,docs:{...(m=e.parameters)==null?void 0:m.docs,source:{originalSource:"{}",...(c=(u=e.parameters)==null?void 0:u.docs)==null?void 0:c.source}}};var p,f,g;r.parameters={...r.parameters,docs:{...(p=r.parameters)==null?void 0:p.docs,source:{originalSource:`{
+  args: {
+    value: 100
+  }
+}`,...(g=(f=r.parameters)==null?void 0:f.docs)==null?void 0:g.source}}};var v,x,y;a.parameters={...a.parameters,docs:{...(v=a.parameters)==null?void 0:v.docs,source:{originalSource:`{
+  args: {
+    indeterminate: true
+  }
+}`,...(y=(x=a.parameters)==null?void 0:x.docs)==null?void 0:y.source}}};const C=["Default","Complete","Indeterminate"];export{r as Complete,e as Default,a as Indeterminate,C as __namedExportsOrder,q as default};
