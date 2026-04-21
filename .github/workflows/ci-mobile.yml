@@ -121,7 +121,7 @@ jobs:
 
       - name: Upload xcresult
         if: always() && steps.ios_scaffold.outputs.ready == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios-xcresult
           path: apps/mobile/ios/build/TestResults.xcresult
@@ -208,7 +208,7 @@ jobs:
 
       - name: Upload Android test reports
         if: always() && steps.android_scaffold.outputs.ready == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-test-reports
           path: |
