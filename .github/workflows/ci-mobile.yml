@@ -75,7 +75,7 @@ jobs:
 
       - name: Cache CocoaPods
         if: steps.ios_scaffold.outputs.ready == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             apps/mobile/ios/Pods
@@ -174,7 +174,7 @@ jobs:
 
       - name: Cache Gradle
         if: steps.android_scaffold.outputs.ready == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
