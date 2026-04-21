@@ -28,7 +28,7 @@ thiserror = "1"
 
 # J1.8 — sidecar adapter
 chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
-which = "6"
+which = "8"
 regex = "1"
 sha2 = "0.10"
 tracing = "0.1"
