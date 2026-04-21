@@ -7,4 +7,4 @@ ruff>=0.7,<0.9
 mypy>=1.11,<2
 datamodel-code-generator>=0.26,<0.30
 types-redis>=4.6,<5
-types-aiofiles>=23,<25
+types-aiofiles>=23,<26
