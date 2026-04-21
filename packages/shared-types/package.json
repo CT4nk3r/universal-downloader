@@ -22,7 +22,7 @@
     "clean": "rimraf .turbo"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
