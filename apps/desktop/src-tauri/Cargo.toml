@@ -24,7 +24,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "process", "io-util", "fs", "time"] }
 uuid = { version = "1", features = ["v4", "serde"] }
-thiserror = "1"
+thiserror = "2"
 
 # J1.8 — sidecar adapter
 chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
